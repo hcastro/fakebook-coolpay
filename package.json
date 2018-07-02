@@ -1,0 +1,17 @@
+{
+  "name": "fakebook-coolpay",
+  "version": "1.0.0",
+  "description": "integration for coolpay API",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Henry Castro",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^6.0.0",
+    "express": "^3.1.0",
+    "express-namespace": "^0.1.1",
+    "request-promise": "^4.2.2"
+  }
+}
