@@ -2,6 +2,7 @@
 
 const rp = require('request-promise')
 
+// 
 module.exports = (req, res, next) => {
 	if (!req.bearerToken) {
 		const options = {
@@ -16,7 +17,7 @@ module.exports = (req, res, next) => {
 
 		rp(options)
 			.then(body => {				
-				req.bearerToken = `12345.${body.token}.67890`
+				req.bearerToken = body.token
 				console.log('req.bearerToken => ', req.bearerToken)
 				next()
 			})
