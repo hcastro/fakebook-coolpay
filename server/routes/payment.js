@@ -20,8 +20,8 @@ class Payment {
 		}
 
 		rp(options)
-			.then(payments => {
-				res.json(payments)
+			.then(body => {
+				res.json(200, body.payments)
 			})
 			.catch(error => {
 				next(error)

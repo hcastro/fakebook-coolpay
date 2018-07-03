@@ -10,10 +10,7 @@ class Recipient {
 		})
 	}
 
-	// TODO: add in search when a query param is passed
 	list (req, res, next) {
-		console.log('req query => ', req.query) // {'name':'Henry'}
-
 		const options = {
 			uri: `${process.env.COOLPAY_ENDPOINT}/recipients`,
 			headers: {
@@ -23,8 +20,15 @@ class Recipient {
 		}
 
 		rp(options)
-			.then(recipients => {
-				res.json(recipients)
+			.then(body => {
+				let recipients = body.recipients
+
+				if (req.query.name) {
+					recipients = recipients
+						.filter(recipient => (recipient.name === req.query.name))
+				}				
+
+				res.json(200, recipients)
 			})
 			.catch(error => {
 				next(error)
