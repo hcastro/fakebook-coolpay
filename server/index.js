@@ -14,12 +14,9 @@ const auth = require('./middleware/auth')
 
 const app = express()
 app.configure('prod', () => {
+	app.use(express.cookieParser())	
 	app.use(express.bodyParser())
-	app.use(express.cookieParser())
-	app.use(app.router())
-	app.get('/', (req, res, next) => {
-		res.redirect('/coolpay')
-	})
+	app.use(app.router)
 })
 
 // logic used to register routes
@@ -29,7 +26,6 @@ const registerRoutes = routePath => {
 		if (file.indexOf('.') >= 0) {
 			let name = file.substr(0, file.indexOf('.'))
 			console.log('registering routes => ', routePath + '/' + name)
-			//console.log("`${routePath}/${name}` => ", `${routePath}/${name}`)
 			require(`${routePath}/${name}`).register(app, middleware)
 		}
 	})
