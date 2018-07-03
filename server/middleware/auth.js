@@ -2,7 +2,7 @@
 
 const rp = require('request-promise')
 
-// 
+ 
 module.exports = (req, res, next) => {
 	if (!req.bearerToken) {
 		const options = {
@@ -21,7 +21,6 @@ module.exports = (req, res, next) => {
 				console.log('req.bearerToken => ', req.bearerToken)
 				next()
 			})
-
 			.catch(error => {
 				next(error)
 			})			
