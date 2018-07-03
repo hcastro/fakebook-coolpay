@@ -18,7 +18,6 @@ module.exports = (req, res, next) => {
 		rp(options)
 			.then(body => {				
 				req.bearerToken = body.token
-				console.log('req.bearerToken => ', req.bearerToken)
 				next()
 			})
 			.catch(error => {
