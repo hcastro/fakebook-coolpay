@@ -11,10 +11,9 @@ require('express-namespace')
 // middleware
 const auth = require('./middleware/auth')
 
-
 const app = express()
 app.configure('prod', () => {
-	app.use(express.cookieParser())	
+	app.use(express.cookieParser())
 	app.use(express.bodyParser())
 	app.use(app.router)
 })
@@ -25,7 +24,6 @@ const registerRoutes = routePath => {
 		// if it's not a directory
 		if (file.indexOf('.') >= 0) {
 			let name = file.substr(0, file.indexOf('.'))
-			console.log('registering routes => ', routePath + '/' + name)
 			require(`${routePath}/${name}`).register(app, middleware)
 		}
 	})
@@ -40,6 +38,6 @@ const middleware = [auth]
 registerRoutes(appRouteDir, middleware)
 
 // initialize server
-const server = http.createServer(app).listen(process.env.PORT, () => {
+http.createServer(app).listen(process.env.PORT, () => {
 	console.log('listening to port: ', process.env.PORT)
 })
