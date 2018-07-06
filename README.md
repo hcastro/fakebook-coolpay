@@ -15,6 +15,11 @@ This app is configured to run on port `3000`
 #### `COOLPAY_API_KEY`
 Contact Coolpay support for credentials
 
+## Startup
+```
+npm start
+```
+
 ## Testing
 Run unit tests
 ```
