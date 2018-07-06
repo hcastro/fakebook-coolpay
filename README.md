@@ -7,6 +7,7 @@ You'll need Node.js 6+ to run and contribute to this project. Automatically get 
 ### Environment Variables
 
 #### `NODE_ENV`
+`prod` is the only supported environment currently
 #### `PORT`
 This app is configured to run on port `3000`
 #### `COOLPAY_BASE_URL`
