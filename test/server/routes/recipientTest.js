@@ -14,7 +14,6 @@ describe('recipient routes', function () {
   let rp, recipient, endpoint, query, data, expectedUri, expectedAuthorization, argMatcher,
     newRecipient, expectedBody
 
-
   before(function () {
     endpoint = '/recipients'
     expectedUri = process.env.COOLPAY_BASE_URL + endpoint
