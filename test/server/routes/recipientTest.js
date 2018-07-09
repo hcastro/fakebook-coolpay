@@ -9,20 +9,29 @@ const expressMock = require('../mocks/expressMock')
 
 process.env.COOLPAY_BASE_URL = 'https://coolpay.herokuapp.com/api'
 
-// TODO: separate get and post into separate suites (describes)
-describe('recipient routes', function () {
-  let rp, recipient, endpoint, query, data, expectedUri, expectedAuthorization, argMatcher,
-    newRecipient, expectedBody
+describe('recipient routes', () => {
+  const endpoint = '/recipients'
+  const expectedUri = process.env.COOLPAY_BASE_URL + endpoint
+  const rp = sinon.stub()
+  const recipient = proxyquire('../../../server/routes/recipient', {
+    'request-promise': rp
+  })
 
-  before(function () {
-    endpoint = '/recipients'
-    expectedUri = process.env.COOLPAY_BASE_URL + endpoint
-    rp = sinon.stub()
-    recipient = proxyquire('../../../server/routes/recipient', {
-      'request-promise': rp
-    })
+  expressMock.req.bearerToken = '123-coolpay'
 
-    data = {
+  const expectedAuthorization = {
+    "Authorization": `Bearer ${expressMock.req.bearerToken}`
+  }
+
+  afterEach(() => {
+    expressMock.req.query = {}
+
+    // reset stub history and behaviour
+    sinon.reset()
+  })
+
+  describe('list()', () => {
+    const data = {
       "recipients":[
         {
           "name": "BingBong",
@@ -34,74 +43,56 @@ describe('recipient routes', function () {
         }
       ]
     }
-  })
 
-  beforeEach(function () {
-    expressMock.req.bearerToken = '123-coolpay'
-    expectedAuthorization = {
-      "Authorization": `Bearer ${expressMock.req.bearerToken}`
-    }
-
-    argMatcher = sinon.match({
+    let argMatcher = sinon.match({
       uri: expectedUri,
       headers: expectedAuthorization,
       json: true
     })
-  })
 
-  afterEach(function () {
-    expressMock.req.query = {}
-
-    // reset stub history and behaviour
-    sinon.reset()
-  })
-
-  it('should pass proper options for list', done => {
-    rp.resolves(true)
-    recipient.list.apply(recipient, expressMock.args)
-    sinon.assert.calledWith(rp, argMatcher)
-    done()
-  })
-
-  it('should pass proper options for list when query is provided', done => {
-    query = expressMock.req.query.name = 'BingBong'
-
-    argMatcher = sinon.match({
-      uri: `${expectedUri}?name=${query}`,
-      headers: expectedAuthorization,
-      json: true
+    it('should pass proper options for list', done => {
+      rp.resolves(Promise.resolve())
+      recipient.list.apply(recipient, expressMock.args)
+      sinon.assert.calledWith(rp, argMatcher)
+      done()
     })
 
-    rp.resolves(true)
-    recipient.list.apply(recipient, [expressMock.req, expressMock.res, expressMock.next])
-    sinon.assert.calledWith(rp, argMatcher)
-    done()
-  })
+    it('should pass proper options for list when query is provided', done => {
+      let query = expressMock.req.query.name = 'BingBong'
 
-  it('should list recipients', done => {
-    expressMock.res = {
-      json: function (code, data) {
-        expect(code).to.equal(200)
-        data.should.have.lengthOf(2)
+      argMatcher = sinon.match({
+        uri: `${expectedUri}?name=${query}`,
+        headers: expectedAuthorization,
+        json: true
+      })
+
+      rp.resolves(Promise.resolve())
+      recipient.list.apply(recipient, expressMock.args)
+      sinon.assert.calledWith(rp, argMatcher)
+      done()
+    })
+
+    it('should list recipients', done => {
+      let next = sinon.spy()
+      rp.resolves(data)
+
+      recipient.list(expressMock.req, expressMock.res, next).then(() => {
+        sinon.assert.calledWith(expressMock.res.json, 200, data.recipients)
         done()
-      }
-    }
-
-    rp.withArgs(argMatcher).resolves(data)
-    recipient.list.apply(recipient, [expressMock.req, expressMock.res, expressMock.next])
+      })
+    })
   })
 
-  it('should pass proper options when creating new recipients', done => {
+  describe('create()', () => {
     expressMock.req.body.recipient = {}
-    newRecipient = expressMock.req.body.recipient.name = 'Luxo'
-
-    expectedBody = {
+    const newRecipient = expressMock.req.body.recipient.name = 'Luxo'
+    const expectedBody = {
       "recipient": {
         "name": newRecipient
       }
     }
 
-    argMatcher = sinon.match({
+    let argMatcher = sinon.match({
       method: 'POST',
       uri: expectedUri,
       headers: expectedAuthorization,
@@ -109,46 +100,22 @@ describe('recipient routes', function () {
       json: true
     })
 
-    rp.resolves(true)
-    recipient.create.apply(recipient, [expressMock.req, expressMock.res, expressMock.next])
-    sinon.assert.calledWith(rp, argMatcher)
-    done()
-  })
-
-  it('should respond successfully after creating new recipients', done => {
-    expressMock.req.body.recipient = {}
-    newRecipient = expressMock.req.body.recipient.name = 'Luxo'
-
-    expectedBody = {
-      "recipient": {
-        "name": newRecipient
-      }
-    }
-
-    argMatcher = sinon.match({
-      method: 'POST',
-      uri: expectedUri,
-      headers: expectedAuthorization,
-      body: expectedBody,
-      json: true
+    it('should pass proper options when creating new recipients', done => {
+      rp.resolves(Promise.resolve())
+      recipient.create.apply(recipient, [expressMock.req, expressMock.res, expressMock.next])
+      sinon.assert.calledWith(rp, argMatcher)
+      done()
     })
 
-    expressMock.res = {
-      json: function (code, message) {
-        expect(code).to.equal(200)
-        expect(message).to.be.a('string')
+    it('should respond successfully after creating a new recipient', done => {
+      let message = 'New recipient created!'
+
+      rp.resolves(Promise.resolve())
+      recipient.create(expressMock.req, expressMock.res, expressMock.next).then(() => {
+        sinon.assert.calledWith(expressMock.res.json, 200, message)
         done()
-      }
-    }
+      })
+    })
 
-    let responseData = {
-      "recipient": {
-        "id": "U-LUXO",
-        "name": "Luxo"
-      }
-    }
-
-    rp.withArgs(argMatcher).resolves(responseData)
-    recipient.create.apply(recipient, [expressMock.req, expressMock.res, expressMock.next])
   })
 })

@@ -28,7 +28,7 @@ class Recipient {
 			json:true
 		}
 
-		rp(options)
+		return rp(options)
 			.then(body => {
 				res.json(200, body.recipients)
 			})
@@ -52,7 +52,7 @@ class Recipient {
 			json: true
 		}
 
-		rp(options)
+		return rp(options)
 			.then(() => {
 				res.json(200, 'New recipient created!')
 			})
