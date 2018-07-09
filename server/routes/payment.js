@@ -21,13 +21,13 @@ class Payment {
 			json:true
 		}
 
-		rp(options)
-			.then(body => {
-				res.json(200, body.payments)
-			})
-			.catch(error => {
-				next(error)
-			})
+    return rp(options)
+    	.then(body => {
+    		res.json(200, body.payments)
+    	})
+    	.catch(error => {
+    		next(error)
+    	})
 	}
 
 	create (req, res, next) {
@@ -49,7 +49,7 @@ class Payment {
       json: true
     }
 
-    rp(options)
+    return rp(options)
       .then(() => {
         res.json(200, 'Payment submitted!')
       })
