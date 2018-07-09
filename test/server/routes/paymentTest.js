@@ -71,7 +71,7 @@ describe('payment routes', () => {
     })
   })
 
-  describe.only('create()', () => {
+  describe('create()', () => {
     let expectedBody, argMatcher
 
     it('should pass proper options when creating new payments', done => {
