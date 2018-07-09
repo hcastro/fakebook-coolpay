@@ -12,6 +12,8 @@ process.env.COOLPAY_BASE_URL = 'https://coolpay.herokuapp.com/api'
 describe('recipient routes', () => {
   const endpoint = '/recipients'
   const expectedUri = process.env.COOLPAY_BASE_URL + endpoint
+
+  // stub out the request-promise package
   const rp = sinon.stub()
   const recipient = proxyquire('../../../server/routes/recipient', {
     'request-promise': rp
@@ -24,6 +26,7 @@ describe('recipient routes', () => {
   }
 
   afterEach(() => {
+    expressMock.req.body = {}
     expressMock.req.query = {}
 
     // reset stub history and behaviour
@@ -84,20 +87,25 @@ describe('recipient routes', () => {
   })
 
   describe('create()', () => {
-    expressMock.req.body.recipient = {}
-    const newRecipient = expressMock.req.body.recipient.name = 'Luxo'
-    const expectedBody = {
-      "recipient": {
-        "name": newRecipient
-      }
-    }
+    let newRecipient, expectedBody, argMatcher
 
-    let argMatcher = sinon.match({
-      method: 'POST',
-      uri: expectedUri,
-      headers: expectedAuthorization,
-      body: expectedBody,
-      json: true
+    beforeEach(() => {
+      expressMock.req.body.recipient = {}
+      newRecipient = expressMock.req.body.recipient.name = 'Luxo'
+
+      expectedBody = {
+        "recipient": {
+          "name": newRecipient
+        }
+      }
+
+      argMatcher = sinon.match({
+        method: 'POST',
+        uri: expectedUri,
+        headers: expectedAuthorization,
+        body: expectedBody,
+        json: true
+      })
     })
 
     it('should pass proper options when creating new recipients', done => {

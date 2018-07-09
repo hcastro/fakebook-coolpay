@@ -8,7 +8,7 @@ let req = {
 }
 
 let res = {
-  json: (status, result) => {}
+  json: () => {}
 }
 sinon.spy(res, 'json')
 
