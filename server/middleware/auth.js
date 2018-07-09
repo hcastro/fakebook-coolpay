@@ -14,7 +14,7 @@ module.exports = (req, res, next) => {
 			json: true
 		}
 
-		rp(options)
+		return rp(options)
 			.then(body => {
 				req.bearerToken = body.token
 				next()
