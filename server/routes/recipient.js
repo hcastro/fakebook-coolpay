@@ -1,6 +1,8 @@
 'use strict'
 
-const rp = require('request-promise')
+const request = require('request-promise')
+
+const requestBuilder = require('../lib/requestBuilder')
 
 const RecipientValidator = require('../validators/recipient')
 
@@ -16,19 +18,11 @@ class Recipient {
     let endpoint = '/recipients'
 
     // add in search query when provided
-    if (req.query.name) {
-      endpoint += `?name=${req.query.name}`
-    }
+    if (req.query.name) endpoint += `?name=${req.query.name}`
 
-		const options = {
-			uri: `${process.env.COOLPAY_BASE_URL}${endpoint}`,
-			headers: {
-				"Authorization": `Bearer ${req.bearerToken}`
-			},
-			json:true
-		}
+    const options = requestBuilder('GET', endpoint, req.bearerToken)
 
-		return rp(options)
+		return request(options)
 			.then(body => {
 				res.json(200, body.recipients)
 			})
@@ -38,21 +32,9 @@ class Recipient {
 	}
 
 	create (req, res, next) {
-		const options = {
-			method: 'POST',
-			uri: `${process.env.COOLPAY_BASE_URL}/recipients`,
-			headers: {
-				"Authorization": `Bearer ${req.bearerToken}`
-			},
-			body: {
-				"recipient": {
-					"name": req.body.recipient.name
-				}
-			},
-			json: true
-		}
+    const options = requestBuilder('POST', "/recipients", req.bearerToken, req.body)
 
-		return rp(options)
+		return request(options)
 			.then(() => {
 				res.json(200, 'New recipient created!')
 			})

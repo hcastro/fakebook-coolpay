@@ -1,6 +1,8 @@
 'use strict'
 
-const rp = require('request-promise')
+const request = require('request-promise')
+
+const requestBuilder = require('../lib/requestBuilder')
 
 const paymentValidator = require('../validators/payment')
 
@@ -13,15 +15,9 @@ class Payment {
 	}
 
 	list (req, res, next) {
-		const options = {
-			uri: `${process.env.COOLPAY_BASE_URL}/payments`,
-			headers: {
-				"Authorization": `Bearer ${req.bearerToken}`
-			},
-			json:true
-		}
+    const options = requestBuilder('GET', "/payments", req.bearerToken)
 
-    return rp(options)
+    return request(options)
     	.then(body => {
     		res.json(200, body.payments)
     	})
@@ -31,25 +27,9 @@ class Payment {
 	}
 
 	create (req, res, next) {
-    const payment = req.body.payment
+    const options = requestBuilder('POST', "/payments", req.bearerToken, req.body)
 
-    const options = {
-      method: 'POST',
-      uri: `${process.env.COOLPAY_BASE_URL}/payments`,
-      headers: {
-        "Authorization": `Bearer ${req.bearerToken}`
-      },
-      body: {
-        "payment": {
-          "amount": payment.amount,
-          "currency": payment.currency,
-          "recipient_id": payment.recipient_id
-        }
-      },
-      json: true
-    }
-
-    return rp(options)
+    return request(options)
       .then(() => {
         res.json(200, 'Payment submitted!')
       })
