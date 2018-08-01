@@ -52,8 +52,7 @@ class Payment {
             switch (paymentStatus) {
               case 'processing':
                 //re-check status every second
-                return delay(1000)
-                  .then(() => (checkStatus(retrievePaymentOptions, paymentId)))
+                return delay(1000).then(() => (checkStatus(retrievePaymentOptions, paymentId)))
 
               //payment is successfully made
               case 'paid':
@@ -61,37 +60,31 @@ class Payment {
 
               //payment fails. Retry submission if we havent reached the retry threshold
               case 'failed':
-                return attemptPaymentSubmission(submitPaymentOptions)
+                if (tries <= maxTries) return attemptPaymentSubmission(submitPaymentOptions)
+                else return paymentStatus
             }
 
           } else {
-            reject("payment not found!")
+            throw new Error("payment not found!")
           }
         })
     }
 
-    //tried to submit payment with retry mechanism
+    //tries to submit payment with retry mechanism
     const attemptPaymentSubmission = options => {
       let paymentId
 
-      if (tries < maxTries) {
-        tries++
-        return request(options)
-          .then((body) => (delay(1000, body.payment)))
-          .then((payment) => {
-            paymentId = payment.id
-
-            return checkStatus(retrievePaymentOptions, paymentId)
-          })
-          .then(status => {
-            res.json(200, 'Payment successfully submitted!')
-
-          })
-          .catch(error => next(error))
-        } else {
-          next(new Error(`payment failed after ${maxTries} attempts!`))
-        }
+      tries++
+      return request(options)
+        .then(body => (checkStatus(retrievePaymentOptions, body.payment.id)))
+        .then(status => {
+          (status === 'paid')
+            ? res.json(200, 'Payment successfully submitted!')
+            : res.json(400, `payment failed after ${maxTries} attempts!`)
+        })
+        .catch(error => next(error))
     }
+
     attemptPaymentSubmission(submitPaymentOptions)
 	}
 }
