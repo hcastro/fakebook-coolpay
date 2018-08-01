@@ -14,9 +14,9 @@ module.exports = (verb, path, auth, body) => {
     if (path === '/payments') {
       const payment = {
         "payment": {
-          "amount": body.amount,
-          "currency": body.currency,
-          "recipient_id": body.recipient_id
+          "amount": body.payment.amount,
+          "currency": body.payment.currency,
+          "recipient_id": body.payment.recipient_id
         }
       }
       options["body"] = payment
